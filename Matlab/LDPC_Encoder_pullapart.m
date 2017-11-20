@@ -10,20 +10,30 @@ ct2 = [22152 24261 8297 19347 9978 27802 34991 6354 33561 29782 30875 29523 9278
 %This is how you generate the same values in Table 7A
 %but NOT Table 7B
 q = (numParityBits/R);
-b = (1:R);
-bq = (b-1).'*q;
+bq = ((1:R)-1).'*q;
 ck1 = zeros(D, R*N);
 for r=1:N
-    ck1(:, R*(r-1)+1:R*r) = mod(addcr(bq, ct1(r,:)), numParityBits)';
+    No = length(ct1(r,:));
+    A = zeros(R, No);
+    for m = 1:R
+        A(m, :) = ct1(r,:) + bq(m);
+    end
+    ck1(:, R*(r-1)+1:R*r) = mod(A, numParityBits)';
 end
 
 [N, D] = size(ct2);
+%This is how you generate the same values in Table 7A
+%but NOT Table 7B
 q = (numParityBits/R);
-b = (1:R);
-bq = (b-1).'*q;
+bq = ((1:R)-1).'*q;
 ck2 = zeros(D, R*N);
 for r=1:N
-    ck2(:, R*(r-1)+1:R*r) = mod(addcr(bq, ct2(r,:)), numParityBits)';
+    No = length(ct2(r,:));
+    A = zeros(R, No);
+    for m = 1:R
+        A(m, :) = ct2(r,:) + bq(m);
+    end
+    ck2(:, R*(r-1)+1:R*r) = mod(A, numParityBits)';
 end
 
 d = [size(ck1,2) size(ck1,1) size(ck2,2) size(ck2,1) numParityBits-1 2 1 1];
@@ -41,27 +51,8 @@ end
 
 % Parity-check matrix (sparse) for DVB-S.2
 outputFormat = 'sparse'; % Sparse matrix by default
-if nargin == 2
-    if ~strcmp(varargin{1}, 'sparse') && ~strcmp(varargin{1}, 'indices')
-        error(message('comm:dvbs2ldpc:InvalidOutputFormat'));
-    end
-    outputFormat = varargin{1};
-end
-
 if strcmp(outputFormat, 'sparse');
     H = logical(sparse(double(r+1), S, 1));
 else
     H = [double(r+1), double(S)];
 end
-
-
-
-%--------------------------------------------------------------------------
-function A = addcr(c, r)
-M = length(c);
-N = length(r);
-A = zeros(M, N);
-for m = 1:M
-    A(m, :) = r + c(m);
-end
-
