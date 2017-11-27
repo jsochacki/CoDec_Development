@@ -70,6 +70,8 @@
                                 <option id="gnu.c.link.option.libs.1365172041" name="Libraries (-l)" superClass="gnu.c.link.option.libs" useByScannerDiscovery="false" valueType="libs">
                                     									
                                     <listOptionValue builtIn="false" value="pal"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="m"/>
                                     								
                                 </option>
                                 								

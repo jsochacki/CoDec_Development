@@ -61,6 +61,39 @@ void initialize_ramp_double(double *x, UINT length_x)
     }
 }
 
+// CFLOAT
+void initialize_ramp_cfloat(CFLOAT *x, UINT length_x)
+{
+    // Ramp initialize
+    UINT i = 0;
+    for ( ; i < length_x; i++)
+    {
+        x[i] = i;
+    }
+}
+
+// CDOUBLE
+void initialize_ramp_cdouble(CDOUBLE *x, UINT length_x)
+{
+    // Ramp initialize
+    UINT i = 0;
+    for ( ; i < length_x; i++)
+    {
+        x[i] = i;
+    }
+}
+
+// CLDOUBLE
+void initialize_ramp_cldouble(CLDOUBLE *x, UINT length_x)
+{
+    // Ramp initialize
+    UINT i = 0;
+    for ( ; i < length_x; i++)
+    {
+        x[i] = i;
+    }
+}
+
 /******************************************************************************/
 // swap_vectors
 /******************************************************************************/
@@ -410,21 +443,219 @@ void swap_vectors_double(double **x, UINT *length_x, double **y, UINT *length_y)
     }
 }
 
+// CFLOAT
+void swap_vectors_cfloat(CFLOAT **x, UINT *length_x, CFLOAT **y, UINT *length_y)
+{
+    UINT local_length_x = *length_x;
+    UINT local_length_y = *length_y;
+
+    // Swap lengths for the user
+    swap_uint(length_x, length_y);
+
+    if (local_length_x < local_length_y)
+    {
+        // Transfer y to z
+        CFLOAT *z = (CFLOAT *) malloc(local_length_y * sizeof(CFLOAT));
+
+        UINT i = 0;
+        for( ; i < local_length_y; i++)
+        {
+            z[i] = y[0][i];
+        }
+
+        // Transfer x to y
+        *y = (CFLOAT *) realloc(*y, local_length_x * sizeof(CFLOAT));
+
+        for(i = 0; i < local_length_x; i++)
+        {
+            y[0][i] = x[0][i];
+        }
+
+        // Transfer z to x
+        *x = (CFLOAT *) realloc(*x, local_length_y * sizeof(CFLOAT));
+
+        for(i = 0; i < local_length_y; i++)
+        {
+            x[0][i] = z[i];
+        }
+
+        free(z);
+    }
+    else
+    {
+        // Transfer x to z
+        CFLOAT *z = (CFLOAT *) malloc(local_length_x * sizeof(CFLOAT));
+
+        UINT i = 0;
+        for( ; i < local_length_x; i++)
+        {
+            z[i] = x[0][i];
+        }
+
+        // Transfer y to x
+        *x = (CFLOAT *) realloc(*x, local_length_y * sizeof(CFLOAT));
+
+        for(i = 0; i < local_length_y; i++)
+        {
+            x[0][i] = y[0][i];
+        }
+
+        // Transfer z to y
+        *y = (CFLOAT *) realloc(*y, local_length_x * sizeof(CFLOAT));
+
+        for(i = 0; i < local_length_x; i++)
+        {
+            y[0][i] = z[i];
+        }
+
+        free(z);
+    }
+}
+
+// CDOUBLE
+void swap_vectors_cdouble(CDOUBLE **x, UINT *length_x, CDOUBLE **y, UINT *length_y)
+{
+    UINT local_length_x = *length_x;
+    UINT local_length_y = *length_y;
+
+    // Swap lengths for the user
+    swap_uint(length_x, length_y);
+
+    if (local_length_x < local_length_y)
+    {
+        // Transfer y to z
+        CDOUBLE *z = (CDOUBLE *) malloc(local_length_y * sizeof(CDOUBLE));
+
+        UINT i = 0;
+        for( ; i < local_length_y; i++)
+        {
+            z[i] = y[0][i];
+        }
+
+        // Transfer x to y
+        *y = (CDOUBLE *) realloc(*y, local_length_x * sizeof(CDOUBLE));
+
+        for(i = 0; i < local_length_x; i++)
+        {
+            y[0][i] = x[0][i];
+        }
+
+        // Transfer z to x
+        *x = (CDOUBLE *) realloc(*x, local_length_y * sizeof(CDOUBLE));
+
+        for(i = 0; i < local_length_y; i++)
+        {
+            x[0][i] = z[i];
+        }
+
+        free(z);
+    }
+    else
+    {
+        // Transfer x to z
+        CDOUBLE *z = (CDOUBLE *) malloc(local_length_x * sizeof(CDOUBLE));
+
+        UINT i = 0;
+        for( ; i < local_length_x; i++)
+        {
+            z[i] = x[0][i];
+        }
+
+        // Transfer y to x
+        *x = (CDOUBLE *) realloc(*x, local_length_y * sizeof(CDOUBLE));
+
+        for(i = 0; i < local_length_y; i++)
+        {
+            x[0][i] = y[0][i];
+        }
+
+        // Transfer z to y
+        *y = (CDOUBLE *) realloc(*y, local_length_x * sizeof(CDOUBLE));
+
+        for(i = 0; i < local_length_x; i++)
+        {
+            y[0][i] = z[i];
+        }
+
+        free(z);
+    }
+}
+
+// CLDOUBLE
+void swap_vectors_cldouble(CLDOUBLE **x, UINT *length_x, CLDOUBLE **y, UINT *length_y)
+{
+    UINT local_length_x = *length_x;
+    UINT local_length_y = *length_y;
+
+    // Swap lengths for the user
+    swap_uint(length_x, length_y);
+
+    if (local_length_x < local_length_y)
+    {
+        // Transfer y to z
+        CLDOUBLE *z = (CLDOUBLE *) malloc(local_length_y * sizeof(CLDOUBLE));
+
+        UINT i = 0;
+        for( ; i < local_length_y; i++)
+        {
+            z[i] = y[0][i];
+        }
+
+        // Transfer x to y
+        *y = (CLDOUBLE *) realloc(*y, local_length_x * sizeof(CLDOUBLE));
+
+        for(i = 0; i < local_length_x; i++)
+        {
+            y[0][i] = x[0][i];
+        }
+
+        // Transfer z to x
+        *x = (CLDOUBLE *) realloc(*x, local_length_y * sizeof(CLDOUBLE));
+
+        for(i = 0; i < local_length_y; i++)
+        {
+            x[0][i] = z[i];
+        }
+
+        free(z);
+    }
+    else
+    {
+        // Transfer x to z
+        CLDOUBLE *z = (CLDOUBLE *) malloc(local_length_x * sizeof(CLDOUBLE));
+
+        UINT i = 0;
+        for( ; i < local_length_x; i++)
+        {
+            z[i] = x[0][i];
+        }
+
+        // Transfer y to x
+        *x = (CLDOUBLE *) realloc(*x, local_length_y * sizeof(CLDOUBLE));
+
+        for(i = 0; i < local_length_y; i++)
+        {
+            x[0][i] = y[0][i];
+        }
+
+        // Transfer z to y
+        *y = (CLDOUBLE *) realloc(*y, local_length_x * sizeof(CLDOUBLE));
+
+        for(i = 0; i < local_length_x; i++)
+        {
+            y[0][i] = z[i];
+        }
+
+        free(z);
+    }
+}
+
 /******************************************************************************/
 // swap
 /******************************************************************************/
 
 // int
 void swap_int(int *a, int *b)
-{
-    // Swap lengths for the user
-    *a = *a + *b;
-    *b = *a - *b; // b = a + b - b = a
-    *a = *a - *b; // a = a + b - a - b + b = a + b - a = b
-}
-
-// UINT
-void swap_uint(UINT *a, UINT *b)
 {
     // Swap lengths for the user
     *a = *a + *b;
@@ -461,6 +692,42 @@ void swap_float(float *a, float *b)
 
 //double
 void swap_double(double *a, double *b)
+{
+    // Swap lengths for the user
+    *a = *a + *b;
+    *b = *a - *b; // b = a + b - b = a
+    *a = *a - *b; // a = a + b - a - b + b = a + b - a = b
+}
+
+//CFLOAT
+void swap_cfloat(CFLOAT *a, CFLOAT *b)
+{
+    // Swap lengths for the user
+    *a = *a + *b;
+    *b = *a - *b; // b = a + b - b = a
+    *a = *a - *b; // a = a + b - a - b + b = a + b - a = b
+}
+
+//CDOUBLE
+void swap_cdouble(CDOUBLE *a, CDOUBLE *b)
+{
+    // Swap lengths for the user
+    *a = *a + *b;
+    *b = *a - *b; // b = a + b - b = a
+    *a = *a - *b; // a = a + b - a - b + b = a + b - a = b
+}
+
+//CLDOUBLE
+void swap_cldouble(CLDOUBLE *a, CLDOUBLE *b)
+{
+    // Swap lengths for the user
+    *a = *a + *b;
+    *b = *a - *b; // b = a + b - b = a
+    *a = *a - *b; // a = a + b - a - b + b = a + b - a = b
+}
+
+// UINT
+void swap_uint(UINT *a, UINT *b)
 {
     // Swap lengths for the user
     *a = *a + *b;
@@ -592,6 +859,77 @@ UINT zero_pad_fb_double(double **result, double *x, UINT length_x, UINT PAD_SIZE
     return length_result;
 }
 
+// CFLOAT
+UINT zero_pad_fb_cfloat(CFLOAT **result, CFLOAT *x, UINT length_x, UINT PAD_SIZE)
+{
+    UINT length_result;
+
+    CFLOAT *x_base = x;
+
+    length_result = (length_x + (2 * PAD_SIZE));
+
+    *result = (CFLOAT *) calloc(length_result, sizeof(CFLOAT));
+
+    UINT i = 0;
+    for( ; i < length_result; i++)
+    {
+        if(!((i < PAD_SIZE) || (i >= (length_result - PAD_SIZE))))
+        {
+            result[0][i] = *(x++);
+        }
+    }
+
+    x = x_base;
+    return length_result;
+}
+
+// CDOUBLE
+UINT zero_pad_fb_cdouble(CDOUBLE **result, CDOUBLE *x, UINT length_x, UINT PAD_SIZE)
+{
+    UINT length_result;
+
+    CDOUBLE *x_base = x;
+
+    length_result = (length_x + (2 * PAD_SIZE));
+
+    *result = (CDOUBLE *) calloc(length_result, sizeof(CDOUBLE));
+
+    UINT i = 0;
+    for( ; i < length_result; i++)
+    {
+        if(!((i < PAD_SIZE) || (i >= (length_result - PAD_SIZE))))
+        {
+            result[0][i] = *(x++);
+        }
+    }
+
+    x = x_base;
+    return length_result;
+}
+
+// CLDOUBLE
+UINT zero_pad_fb_cldouble(CLDOUBLE **result, CLDOUBLE *x, UINT length_x, UINT PAD_SIZE)
+{
+    UINT length_result;
+
+    CLDOUBLE *x_base = x;
+
+    length_result = (length_x + (2 * PAD_SIZE));
+
+    *result = (CLDOUBLE *) calloc(length_result, sizeof(CLDOUBLE));
+
+    UINT i = 0;
+    for( ; i < length_result; i++)
+    {
+        if(!((i < PAD_SIZE) || (i >= (length_result - PAD_SIZE))))
+        {
+            result[0][i] = *(x++);
+        }
+    }
+
+    x = x_base;
+    return length_result;
+}
 /******************************************************************************/
 // flip_vector
 /******************************************************************************/
@@ -676,6 +1014,63 @@ void flip_vector_float(float *x, UINT length_x)
 void flip_vector_double(double *x, UINT length_x)
 {
     double *temp = (double *) malloc(length_x * sizeof(double));
+
+    UINT i = 0;
+    for( ; i < length_x; i++)
+    {
+        temp[(length_x - 1) - i] = x[i];
+    }
+
+    for(i = 0; i < length_x; i++)
+    {
+        x[i] = temp[i];
+    }
+
+    free(temp);
+}
+
+// CFLOAT
+void flip_vector_cfloat(CFLOAT *x, UINT length_x)
+{
+    CFLOAT *temp = (CFLOAT *) malloc(length_x * sizeof(CFLOAT));
+
+    UINT i = 0;
+    for( ; i < length_x; i++)
+    {
+        temp[(length_x - 1) - i] = x[i];
+    }
+
+    for(i = 0; i < length_x; i++)
+    {
+        x[i] = temp[i];
+    }
+
+    free(temp);
+}
+
+// CDOUBLE
+void flip_vector_cdouble(CDOUBLE *x, UINT length_x)
+{
+    CDOUBLE *temp = (CDOUBLE *) malloc(length_x * sizeof(CDOUBLE));
+
+    UINT i = 0;
+    for( ; i < length_x; i++)
+    {
+        temp[(length_x - 1) - i] = x[i];
+    }
+
+    for(i = 0; i < length_x; i++)
+    {
+        x[i] = temp[i];
+    }
+
+    free(temp);
+}
+
+// CLDOUBLE
+void flip_vector_cldouble(CLDOUBLE *x, UINT length_x)
+{
+    CLDOUBLE *temp = (CLDOUBLE *) malloc(length_x * sizeof(CLDOUBLE));
 
     UINT i = 0;
     for( ; i < length_x; i++)
@@ -985,6 +1380,183 @@ UINT conv_double(double **result, double **x, UINT length_x, double **y, UINT le
     if(vector_swap)
     {
         swap_vectors_double(x, &length_x, y, &length_y);
+    }
+
+    return length_result;
+}
+
+// CFLOAT
+UINT conv_cfloat(CFLOAT **result, CFLOAT **x, UINT length_x, CFLOAT **y, UINT length_y)
+{
+    UINT N, M, length_result, length_xpfb;
+    UINT vector_swap = 0;
+
+    CFLOAT *xpfb;
+
+    if(length_x < length_y)
+    {
+        swap_vectors_cfloat(x, &length_x, y, &length_y);
+        vector_swap = 1;
+    }
+
+    N = length_x;
+    M = length_y;
+    length_result = ((M + N) - 1);
+
+    length_xpfb = zero_pad_fb_cfloat(&xpfb, *x, length_x, M-1);
+
+    *result = (CFLOAT *) calloc(N + M - 1, sizeof(CFLOAT));
+
+    CFLOAT *xpfb_base = xpfb;
+
+    CFLOAT *temp_base = xpfb_base;
+    CFLOAT temp_sum;
+
+    // Temporarily flip y for convenience
+    flip_vector_cfloat(*y, length_y);
+
+    UINT i = 0;
+    UINT ii;
+    for( ; i < length_result; i++)
+    {
+        //result(i) = sum(y.*x(n:1:n+(M-1)));
+        temp_sum = 0;
+        for(ii = 0; ii < length_y; ii++)
+        {
+            temp_sum += y[0][ii] * xpfb[ii];
+        }
+
+        result[0][i] = temp_sum;
+
+        xpfb = ++temp_base;
+    }
+
+    xpfb = xpfb_base;
+
+    // Flip y Back
+    flip_vector_cfloat(*y, length_y);
+
+    if(vector_swap)
+    {
+        swap_vectors_cfloat(x, &length_x, y, &length_y);
+    }
+
+    return length_result;
+}
+
+// CDOUBLE
+UINT conv_cdouble(CDOUBLE **result, CDOUBLE **x, UINT length_x, CDOUBLE **y, UINT length_y)
+{
+    UINT N, M, length_result, length_xpfb;
+    UINT vector_swap = 0;
+
+    CDOUBLE *xpfb;
+
+    if(length_x < length_y)
+    {
+        swap_vectors_cdouble(x, &length_x, y, &length_y);
+        vector_swap = 1;
+    }
+
+    N = length_x;
+    M = length_y;
+    length_result = ((M + N) - 1);
+
+    length_xpfb = zero_pad_fb_cdouble(&xpfb, *x, length_x, M-1);
+
+    *result = (CDOUBLE *) calloc(N + M - 1, sizeof(CDOUBLE));
+
+    CDOUBLE *xpfb_base = xpfb;
+
+    CDOUBLE *temp_base = xpfb_base;
+    CDOUBLE temp_sum;
+
+    // Temporarily flip y for convenience
+    flip_vector_cdouble(*y, length_y);
+
+    UINT i = 0;
+    UINT ii;
+    for( ; i < length_result; i++)
+    {
+        //result(i) = sum(y.*x(n:1:n+(M-1)));
+        temp_sum = 0;
+        for(ii = 0; ii < length_y; ii++)
+        {
+            temp_sum += y[0][ii] * xpfb[ii];
+        }
+
+        result[0][i] = temp_sum;
+
+        xpfb = ++temp_base;
+    }
+
+    xpfb = xpfb_base;
+
+    // Flip y Back
+    flip_vector_cdouble(*y, length_y);
+
+    if(vector_swap)
+    {
+        swap_vectors_cdouble(x, &length_x, y, &length_y);
+    }
+
+    return length_result;
+}
+
+// CLDOUBLE
+UINT conv_cldouble(CLDOUBLE **result, CLDOUBLE **x, UINT length_x, CLDOUBLE **y, UINT length_y)
+{
+    UINT N, M, length_result, length_xpfb;
+    UINT vector_swap = 0;
+
+    CLDOUBLE *xpfb;
+
+    if(length_x < length_y)
+    {
+        swap_vectors_cldouble(x, &length_x, y, &length_y);
+        vector_swap = 1;
+    }
+
+    N = length_x;
+    M = length_y;
+    length_result = ((M + N) - 1);
+
+    length_xpfb = zero_pad_fb_cldouble(&xpfb, *x, length_x, M-1);
+
+    *result = (CLDOUBLE *) calloc(N + M - 1, sizeof(CLDOUBLE));
+
+    CLDOUBLE *xpfb_base = xpfb;
+
+    CLDOUBLE *temp_base = xpfb_base;
+    CLDOUBLE temp_sum;
+
+    // Temporarily flip y for convenience
+    flip_vector_cldouble(*y, length_y);
+
+    UINT i = 0;
+    UINT ii;
+    for( ; i < length_result; i++)
+    {
+        //result(i) = sum(y.*x(n:1:n+(M-1)));
+        temp_sum = 0;
+        for(ii = 0; ii < length_y; ii++)
+        {
+            temp_sum += y[0][ii] * xpfb[ii];
+        }
+
+        result[0][i] = temp_sum;
+
+        xpfb = ++temp_base;
+    }
+
+    xpfb = xpfb_base;
+
+    // Flip y Back
+    flip_vector_cldouble(*y, length_y);
+
+    if(vector_swap)
+    {
+        swap_vectors_cldouble(x, &length_x, y, &length_y);
     }
 
     return length_result;
