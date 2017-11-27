@@ -6,7 +6,7 @@
 
 /******************************************************************************/
 
-#define UINT unsigned int
+typedef unsigned int UINT;
 
 
 #endif // SOCHACKI_TYPES
