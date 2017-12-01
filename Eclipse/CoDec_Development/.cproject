@@ -105,7 +105,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
@@ -199,7 +199,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				

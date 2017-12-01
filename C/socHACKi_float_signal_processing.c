@@ -1,6 +1,8 @@
 
 #include <stdlib.h>  // For malloc, calloc, realloc, etc...
+#include <math.h>  // For floor , ceil, etc..
 #include "socHACKi_types.h" // For UINT, etc...
+#include "socHACKi_math_h_overloading.h"
 
 /******************************************************************************/
 // initialize_ramp
@@ -1560,4 +1562,79 @@ UINT conv_cldouble(CLDOUBLE **result, CLDOUBLE **x, UINT length_x, CLDOUBLE **y,
     }
 
     return length_result;
+}
+
+/******************************************************************************/
+// mod
+/******************************************************************************/
+
+// int
+int mod_int(int x, int y)
+{
+    long double xi = ((long double) x);
+    long double yi = ((long double) y);
+    long double n, m;
+    n = floor(xi / yi);
+    m = xi - n * yi;
+    return ((int) m);
+}
+
+// short
+short mod_short(short x, short y)
+{
+    long double xi = ((long double) x);
+    long double yi = ((long double) y);
+    long double n, m;
+    n = floor(xi / yi);
+    m = xi - n * yi;
+    return ((short) m);
+}
+
+// long
+long mod_long(long x, long y)
+{
+    long double xi = ((long double) x);
+    long double yi = ((long double) y);
+    long double n, m;
+    n = floor(xi / yi);
+    m = xi - n * yi;
+    return ((long) m);
+}
+
+// uint
+UINT mod_uint(UINT x, UINT y)
+{
+    long double xi = ((long double) x);
+    long double yi = ((long double) y);
+    long double n, m;
+    n = floor(xi / yi);
+    m = xi - n * yi;
+    return ((UINT) m);
+}
+
+// float
+float mod_float(float x, float y)
+{
+    float n, m;
+    n = floor(x / y);
+    m = x - n * y;
+    return m;
+}
+
+// double
+double mod_double(double x, double y)
+{
+    double n, m;
+    n = floor(x / y);
+    m = x - n * y;
+    return m;
+}
+
+// long double
+long double mod_ldouble(long double x, long double y)
+{
+    long double n, m;
+    n = floor(x / y);
+    m = x - n * y;
+    return m;
 }
