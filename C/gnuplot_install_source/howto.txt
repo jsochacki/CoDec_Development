@@ -1,0 +1,31 @@
+mkdir /usr/local/gnuplot/include
+mkdir /usr/local/gnuplot/include/gnuplot
+mkdir /usr/local/gnuplot/lib
+mkdir /usr/local/gnuplot/bin
+mkdir /usr/local/gnuplot/share
+gcc -O3 -I./src -fPIC -c -o gnuplot_i.o src/gnuplot_i.c
+gcc -shared -o libgnuplot.so gnuplot_i.o
+cp -p src/gnuplot_i.h /usr/local/gnuplot/include/gnuplot
+cp -p libgnuplot.so /usr/local/gnuplot/lib
+cd /usr/local/gnuplot/lib
+#gcc -O3 -I./src -c -o gnuplot_i.o src/gnuplot_i.c
+#ar rc libgnuplot.a gnuplot_i.o
+#cp -p src/gnuplot_i.h /usr/local/gnuplot/include/gnuplot
+#cp -p libgnuplot.a /usr/local/gnuplot/lib
+#cd /usr/local/gnuplot/lib
+#ranlib libgnuplot.a
+ln -s /usr/local/gnuplot/lib/libgnuplot.so /usr/lib/libgnuplot.so
+
+
+now link that library into the standard library path
+
+Now to use just make sure to include 
+/usr/local/gnuplot_i/include/
+in the compiler
+command line it is -I/usr/local/gnuplot_i/include/
+and in the file # include "gnuplot/gnuplot_i.h
+and the library path for the linker
+command line it is -L/usr/local/gnuplot/lib/
+and the library name
+gnuplot
+command line it is -lgnuplot

@@ -1,4 +1,4 @@
-# include "gnuplot_src/gnuplot_i.h"
+# include "gnuplot/gnuplot_i.h"
 
 # include <stdlib.h>
 # include <stdio.h>
