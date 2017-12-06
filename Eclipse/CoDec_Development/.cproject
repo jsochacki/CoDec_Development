@@ -61,6 +61,8 @@
                                     								
                                 </option>
                                 								
+                                <option id="gnu.c.compiler.option.include.files.2138311886" name="Include files (-include)" superClass="gnu.c.compiler.option.include.files" useByScannerDiscovery="false" valueType="includeFiles"/>
+                                								
                                 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.812987176" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
                                 							
                             </tool>
@@ -105,7 +107,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="C/gnuplot_test.c|C/gnuplot_src|C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
@@ -199,7 +201,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="C/gnuplot_test.c|C/gnuplot_src|C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
