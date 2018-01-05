@@ -58,8 +58,12 @@
                                 <option id="gnu.c.compiler.option.include.paths.1211933303" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
                                     									
                                     <listOptionValue builtIn="false" value="/usr/local/pal/include/"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="/usr/local/gnuplot/include/"/>
                                     								
                                 </option>
+                                								
+                                <option id="gnu.c.compiler.option.include.files.2138311886" name="Include files (-include)" superClass="gnu.c.compiler.option.include.files" useByScannerDiscovery="false"/>
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.812987176" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
                                 							
@@ -71,6 +75,8 @@
                                     									
                                     <listOptionValue builtIn="false" value="pal"/>
                                     									
+                                    <listOptionValue builtIn="false" value="gnuplot"/>
+                                    									
                                     <listOptionValue builtIn="false" value="m"/>
                                     								
                                 </option>
@@ -78,6 +84,8 @@
                                 <option id="gnu.c.link.option.paths.610387180" name="Library search path (-L)" superClass="gnu.c.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
                                     									
                                     <listOptionValue builtIn="false" value="/usr/local/pal/lib"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="/usr/local/gnuplot/lib/"/>
                                     								
                                 </option>
                                 								
@@ -105,7 +113,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="C/gnuplot_install_source|C/gnuplot_test.c|C/gnuplot_src|C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
@@ -199,7 +207,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="C/gnuplot_install_source|C/gnuplot_test.c|C/gnuplot_src|C/DFT_Developing.c|C/Convolution_Example.c|C/Overload_test.c|C/pla_test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
