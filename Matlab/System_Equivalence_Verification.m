@@ -217,6 +217,9 @@ end
 
 % PLOT CHECK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if PLOT
+    hold off
+    plot((s))
+    hold on
     plot(r,'bo')
     hold on
     plot(r2,'ro')
