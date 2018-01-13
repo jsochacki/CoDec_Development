@@ -1,10 +1,11 @@
 clear all
- 
+
 fc = 0.25;
-insertion_loss_at_fc = [];
-transition_region_width = 0.021;
+insertion_loss_at_fc = 3;
+% Should be less than alpha = 0.1, 0.0125 is goal for 60dB
+transition_region_width = 0.0125;
 ripple = 0.001; %ripple in dB
-rejection = 60; %rejection in dB
+rejection = 90; %rejection in dB
 
 [sos fos k N] = Chebyshev_IIR_Filter_Designer(fc, ...
                                               insertion_loss_at_fc, ...

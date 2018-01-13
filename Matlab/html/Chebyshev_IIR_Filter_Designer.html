@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Chebyshev_IIR_Filter_Designer</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-01-07"><meta name="DC.source" content="Chebyshev_IIR_Filter_Designer.m"><style type="text/css">
+      --><title>Chebyshev_IIR_Filter_Designer</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-01-12"><meta name="DC.source" content="Chebyshev_IIR_Filter_Designer.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">cutoff_frequency: This is equal to the cutoff frequency of the filter.</a></li><li><a href="#3">It is between 0 and 0.5 as the sampling rate of the filter is 1.</a></li><li><a href="#5">insertion_loss_at_fc: This is equal to the insertion loss at the</a></li><li><a href="#6">cutoff frequency of the filter in dB.  If you want a standard IIR</a></li><li><a href="#7">filter design just use [] in place of this input.</a></li><li><a href="#9">transition_region_width: This is equal to the size of the region where</a></li><li><a href="#10">the filter goes from ripple dB of insertion loss to rejection dB of</a></li><li><a href="#11">insertion loss.  It is equally sized about fc with half of it being</a></li><li><a href="#12">lower than fc and the other half being higher than fc.</a></li><li><a href="#14">ripple: This is equal to the ripple of the filter for f &lt;= fp in dB</a></li><li><a href="#16">rejection: This is equal to the rejection of the filter for f &gt;= fs in dB</a></li><li><a href="#18">Due to accuracy issues, using x = power(10,-insertion_loss_at_fc/10);</a></li><li><a href="#19">is not allowed, instead you only get discrete steps, sorry.</a></li><li><a href="#20">If the user specified a particular insertion loss adjust the filter</a></li><li><a href="#21">parameters</a></li><li><a href="#22">Generate the poles</a></li><li><a href="#23">Perform the bilinear transform</a></li><li><a href="#24">Solve for the filter coefficients</a></li><li><a href="#25">You will see the a coefficients had - signs where mine do not in my</a></li><li><a href="#26">derivation and this is becuase matlab defines the transfer function</a></li><li><a href="#27">of a sos to be:</a></li><li><a href="#29">while I define it to be:</a></li><li><a href="#32">Calculate the filter gain k</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [sos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, <span class="keyword">...</span>
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">cutoff_frequency: This is equal to the cutoff frequency of the filter.</a></li><li><a href="#3">It is between 0 and 0.5 as the sampling rate of the filter is 1.</a></li><li><a href="#5">insertion_loss_at_fc: This is equal to the insertion loss at the</a></li><li><a href="#6">cutoff frequency of the filter in dB.  If you want a standard IIR</a></li><li><a href="#7">filter design just use [] in place of this input.</a></li><li><a href="#9">transition_region_width: This is equal to the size of the region where</a></li><li><a href="#10">the filter goes from ripple dB of insertion loss to rejection dB of</a></li><li><a href="#11">insertion loss.  It is equally sized about fc with half of it being</a></li><li><a href="#12">lower than fc and the other half being higher than fc.</a></li><li><a href="#14">ripple: This is equal to the ripple of the filter for f &lt;= fp in dB</a></li><li><a href="#16">rejection: This is equal to the rejection of the filter for f &gt;= fs in dB</a></li><li><a href="#18">Due to accuracy issues, using x = power(10,-insertion_loss_at_fc/10);</a></li><li><a href="#19">is not allowed, instead you only get discrete steps, sorry.</a></li><li><a href="#20">If the user specified a particular insertion loss adjust the filter</a></li><li><a href="#21">parameters</a></li><li><a href="#22">Generate the poles</a></li><li><a href="#23">Perform the bilinear transform</a></li><li><a href="#24">Solve for the filter coefficients</a></li><li><a href="#25">You will see the a coefficients had - signs where mine do not in my</a></li><li><a href="#26">derivation and this is becuase matlab defines the transfer function</a></li><li><a href="#27">of a sos to be:</a></li><li><a href="#29">while I define it to be:</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [sos fos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, <span class="keyword">...</span>
                         insertion_loss_at_fc, <span class="keyword">...</span>
                         transition_region_width, <span class="keyword">...</span>
                         ripple, <span class="keyword">...</span>
@@ -101,7 +101,6 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
     eta = sqrt(power(10,ripple/10)-1);
     A2 = sqrt(power(10,rejection/10)-1);
-    A2 = sqrt(power(10,3/10)-1);
 
     c = 1 / tan(omega_p / 2);
 
@@ -128,30 +127,31 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
         p = [p sigma+j*omega];
         n = n - 1;
     <span class="keyword">end</span>
-</pre><h2>Perform the bilinear transform<a name="23"></a></h2><pre class="codeinput">    bilin =  @(s,c) (1+s./c)./(1-s./c)
+</pre><h2>Perform the bilinear transform<a name="23"></a></h2><pre class="codeinput">    bilin =  @(s,c) (1+s./c)./(1-s./c);
     z = bilin(p,c);
 </pre><h2>Solve for the filter coefficients<a name="24"></a></h2><pre class="codeinput">    a = [];
     b = [];
-    sos = [];
+    sos = []; fos = [];
     n = N;
     Z = length(z);
     <span class="keyword">while</span> Z
         <span class="keyword">if</span> mod(Z, 2)
             a = [a 1 real( z(((Z+1)/2)) )];
             b = [b 1 1];
-            fos = [fos; 1 1 1 real( z(((Z+1)/2)) )];
+            fos = [1 1 1 -real( z(((Z+1)/2)) )];
             z = [z(1:(((Z+1)/2)-1)) z((((Z+1)/2)+1):end) ];
             n = n - 1;
         <span class="keyword">else</span>
             a = [a 1 real(z(1) + z(end)) real(-z(1)*z(end))];
             b = [b 1 2 1];
-            sos = [sos; 1 2 1 1 real(z(1) + z(end)) real(-z(1)*z(end))];
+            sos = [sos; 1 2 1 1 -real(z(1) + z(end)) -real(-z(1)*z(end))];
             z = z(2:end-1);
             n = n - 2;
         <span class="keyword">end</span>
         Z = length(z);
     <span class="keyword">end</span>
-</pre><h2>You will see the a coefficients had - signs where mine do not in my<a name="25"></a></h2><h2>derivation and this is becuase matlab defines the transfer function<a name="26"></a></h2><h2>of a sos to be:<a name="27"></a></h2><p><img src="Chebyshev_IIR_Filter_Designer_eq02307571516309593378.png" alt="$$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} -&#xA;\frac{\mathrm{b2}}{z^2}}{\mathrm{a0} + \frac{\mathrm{a1}}{z} +&#xA;\frac{\mathrm{a2}}{z^2}}$$"></p><h2>while I define it to be:<a name="29"></a></h2><p><img src="Chebyshev_IIR_Filter_Designer_eq14462385980857407206.png" alt="$$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} -&#xA;\frac{\mathrm{b2}}{z^2}}{\mathrm{a0} - \frac{\mathrm{a1}}{z} -&#xA;\frac{\mathrm{a2}}{z^2}}$$"></p><pre class="codeinput">    <span class="keyword">if</span> mod(N, 2)
+</pre><h2>You will see the a coefficients had - signs where mine do not in my<a name="25"></a></h2><h2>derivation and this is becuase matlab defines the transfer function<a name="26"></a></h2><h2>of a sos to be:<a name="27"></a></h2><p><img src="Chebyshev_IIR_Filter_Designer_eq09302991886257470247.png" alt="$$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} +&#xA;\frac{\mathrm{b2}}{z^2}}{\mathrm{a0} + \frac{\mathrm{a1}}{z} +&#xA;\frac{\mathrm{a2}}{z^2}}$$"></p><h2>while I define it to be:<a name="29"></a></h2><p><img src="Chebyshev_IIR_Filter_Designer_eq11954985223165382897.png" alt="$$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} +&#xA;\frac{\mathrm{b2}}{z^2}}{\mathrm{a0} - \frac{\mathrm{a1}}{z} -&#xA;\frac{\mathrm{a2}}{z^2}}$$"></p><pre class="codeinput">	<span class="comment">%%% Calculate the filter gain k</span>
+    <span class="keyword">if</span> mod(N, 2)
         prod = (b(1)+b(2)) / (a(1)-a(2));
         start_index = 3;
     <span class="keyword">else</span>
@@ -162,7 +162,8 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
     <span class="keyword">for</span> i = start_index:3:length(a)
         prod = prod * ((b(i)+b(i+1)+b(i+2)) / (a(i)-a(i+1)-a(i+2)));
     <span class="keyword">end</span>
-</pre><h2>Calculate the filter gain k<a name="32"></a></h2><pre class="codeinput">    <span class="keyword">if</span> mod(N, 2)
+
+    <span class="keyword">if</span> mod(N, 2)
         k = 1 / prod;
     <span class="keyword">else</span>
         k = (1 / sqrt(1 + power(eta, 2))) / prod;
@@ -175,7 +176,7 @@ Error in Chebyshev_IIR_Filter_Designer (line 26)
     if isvector(insertion_loss_at_fc)
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-function [sos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, ...
+function [sos fos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, ...
                         insertion_loss_at_fc, ...
                         transition_region_width, ...
                         ripple, ...
@@ -230,7 +231,6 @@ function [sos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, ...
 
     eta = sqrt(power(10,ripple/10)-1);
     A2 = sqrt(power(10,rejection/10)-1);
-    A2 = sqrt(power(10,3/10)-1);
 
     c = 1 / tan(omega_p / 2);
 
@@ -264,26 +264,26 @@ function [sos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, ...
     end
 
     %%% Perform the bilinear transform
-    bilin =  @(s,c) (1+s./c)./(1-s./c)
+    bilin =  @(s,c) (1+s./c)./(1-s./c);
     z = bilin(p,c);
 
     %%% Solve for the filter coefficients
     a = [];
     b = [];
-    sos = [];
+    sos = []; fos = [];
     n = N;
     Z = length(z);
     while Z
         if mod(Z, 2)
             a = [a 1 real( z(((Z+1)/2)) )];
             b = [b 1 1];
-            fos = [fos; 1 1 1 real( z(((Z+1)/2)) )];
+            fos = [1 1 1 -real( z(((Z+1)/2)) )];
             z = [z(1:(((Z+1)/2)-1)) z((((Z+1)/2)+1):end) ];
             n = n - 1;
         else
             a = [a 1 real(z(1) + z(end)) real(-z(1)*z(end))];
             b = [b 1 2 1];
-            sos = [sos; 1 2 1 1 real(z(1) + z(end)) real(-z(1)*z(end))];
+            sos = [sos; 1 2 1 1 -real(z(1) + z(end)) -real(-z(1)*z(end))];
             z = z(2:end-1);
             n = n - 2;
         end
@@ -294,18 +294,19 @@ function [sos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, ...
     %%% derivation and this is becuase matlab defines the transfer function
     %%% of a sos to be:
     %%%
-    % $$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} -
+    % $$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} +
     % \frac{\mathrm{b2}}{z^2}}{\mathrm{a0} + \frac{\mathrm{a1}}{z} +
     % \frac{\mathrm{a2}}{z^2}}$$
     % 
     %%% while I define it to be:
     %%%
-    % $$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} -
+    % $$\prod_{i=1}^{\L} \frac{\mathrm{b0} + \frac{\mathrm{b1}}{z} +
     % \frac{\mathrm{b2}}{z^2}}{\mathrm{a0} - \frac{\mathrm{a1}}{z} -
     % \frac{\mathrm{a2}}{z^2}}$$
     % 
     %%%
 
+	%%% Calculate the filter gain k
     if mod(N, 2)
         prod = (b(1)+b(2)) / (a(1)-a(2));
         start_index = 3;
@@ -318,7 +319,6 @@ function [sos k N] = Chebyshev_IIR_Filter_Designer(cutoff_frequency, ...
         prod = prod * ((b(i)+b(i+1)+b(i+2)) / (a(i)-a(i+1)-a(i+2)));
     end
 
-    %%% Calculate the filter gain k
     if mod(N, 2)
         k = 1 / prod;
     else

@@ -12,8 +12,14 @@ PnPoly = [7 3 0];               % > 7dB, good stddev
 %PnPoly = [7 6 3 1 0];          % >12dB
 %PnPoly = [7 6 5 2 0];          % >12dB
 
+PnPoly = [7 6 0];               % ML for 2^7
+PnPoly = [10 7 0];              % ML for 2^10
+PnPoly = [13 12 10 9 0];        % ML for 2^13
+PnPoly = [14 13 8 4 0];         % ML for 2^14
+PnPoly = [17 14 0];             % ML for 2^17
+
 PNLength = (2^7) - 1;         % PN length based on generator polynomial
-PnInit = [0 0 0 0 0 1 0];
+PnInit = [0 0 0 0 0 0 1];
 
 % PnPoly = [53 6 2 1 0];
 % PnInit = [zeros(1,52) 1];
@@ -27,7 +33,7 @@ one_shot = (x1(1:PNLength) + 1) / 2;
 %%% Deal with Zero Runs
 zero_runs = one_shot.*(1:1:length(one_shot)).';
 run_indicies = find(zero_runs > 0);
-zero_runs = diff([0; zero_runs(run_indicies); 128])-1;
+zero_runs = diff([0; zero_runs(run_indicies); (PNLength + 1)])-1;
 run_indicies = find(zero_runs > 0);
 zero_runs = sort(zero_runs(run_indicies));
 zero_runs_count = [];
@@ -37,7 +43,7 @@ end
 %%% Deal with Ones Runs
 one_runs = -(one_shot - 1).*(1:1:length(one_shot)).';
 run_indicies = find(one_runs > 0);
-one_runs = diff([0; one_runs(run_indicies); 128])-1;
+one_runs = diff([0; one_runs(run_indicies); (PNLength + 1)])-1;
 run_indicies = find(one_runs > 0);
 one_runs = sort(one_runs(run_indicies));
 one_runs_count = [];
@@ -78,27 +84,6 @@ end
 %%% END
 %%% Calculate run length metrics
 
-% Sample_Size = 0;
-% mean_standard_deviation = [];
-% for Sample_Size = 1:1:10 %They all go to 1 virtually for larger chunk sizes
-%     temp = 0; count = 0;
-%     for n = Sample_Size:Sample_Size:length(x1)
-%         temp = temp + std(x1(((n - Sample_Size) + 1):n));
-%         count = count + 1;
-%     end
-%     %%% I think you want to ignore this so it doesn't skew due to non
-%     %%% sample size result although you will start ignoring a large portion
-%     %%% of the pn code if you just do it on the PN code alone so you
-%     %%% probably want to generate a PN code and append it to its self
-%     %%% several times and then do this test on that and keep the part below
-%     %%% commented out.
-% %     if n < length(x1)
-% %         temp = temp + std(x1(n:end));
-% %         count = count + 1;
-% %     end
-% mean_standard_deviation = [mean_standard_deviation (temp / count)];
-% end
-
 PN = x1;
 
 %%% Look at symmetry
@@ -137,3 +122,26 @@ three_steps = peak_dB - ...
 relative_metric(peaks) = [];
 
 distance_dB = peak_dB - 20*log10(mean(abs(relative_metric)))
+
+%%% Look at standard deviation (not sure this is required at all, probably
+%%% need to delete so as not to confuse in the future)
+% Sample_Size = 0;
+% mean_standard_deviation = [];
+% for Sample_Size = 1:1:10 %They all go to 1 virtually for larger chunk sizes
+%     temp = 0; count = 0;
+%     for n = Sample_Size:Sample_Size:length(x1)
+%         temp = temp + std(x1(((n - Sample_Size) + 1):n));
+%         count = count + 1;
+%     end
+%     %%% I think you want to ignore this so it doesn't skew due to non
+%     %%% sample size result although you will start ignoring a large portion
+%     %%% of the pn code if you just do it on the PN code alone so you
+%     %%% probably want to generate a PN code and append it to its self
+%     %%% several times and then do this test on that and keep the part below
+%     %%% commented out.
+% %     if n < length(x1)
+% %         temp = temp + std(x1(n:end));
+% %         count = count + 1;
+% %     end
+% mean_standard_deviation = [mean_standard_deviation (temp / count)];
+% end
