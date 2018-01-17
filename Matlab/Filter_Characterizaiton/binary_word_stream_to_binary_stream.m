@@ -7,10 +7,13 @@ function [binary_stream]=binary_word_stream_to_binary_stream(word_stream,BITS_PE
 % BITS_PER_WORD=1 AND THIS WILL COLLUMIZE THE DECIMAL DATA FOR
 % PROPER PROCESSING IN OTHER FUNCTION
 trn=0;
-binary_stream=[];
 if size(word_stream,2) > BITS_PER_WORD, trn=1; word_stream=word_stream.';, end;
+% Pre allocating makes it 4 x faster
+binary_stream = zeros(1, size(word_stream, 1) * BITS_PER_WORD);
+index = 1;
 for nn=1:1:length(word_stream)
-    binary_stream=[binary_stream word_stream(nn, :)];
+    binary_stream(index:(index + BITS_PER_WORD - 1)) = word_stream(nn, :);
+    index = index + BITS_PER_WORD;
 end
 if ~trn, binary_stream=binary_stream.';, end;
 end
