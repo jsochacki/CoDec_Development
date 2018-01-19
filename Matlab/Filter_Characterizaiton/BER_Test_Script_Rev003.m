@@ -1,11 +1,9 @@
-
-% variables_3dB = {'sos_3dB', 'fos_3dB', 'k_3dB'};
-% 
-% test_variables = load('filter_coefficients.mat',variables_3dB{:})
-% 
-% %Access is done dynamically in the following manner
-% test_variables.(variables_3dB{1})
 clear all
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% This Rev of the script does BER calculations for the SRRC filter using
+%%% the standard signal processing chain
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %RNG Settings
 rng('default');
@@ -38,7 +36,7 @@ for seed = 1:1:20
     rng(seed_vector(seed), 'twister');
     for EbN0 = EbN0_min:step:EbN0_max
         EbN0
-        ERRORS = 0; SYMBOLS = 0;
+        ERRORS = 0; BITCOUNT = 0;
         if EbN0 < 3
             ERRORLIMIT = 1000;
             NumberOfSymbols = 2^14;
@@ -117,10 +115,10 @@ for seed = 1:1:20
                       (NumberOfSymbols - ...
                        sum(transmitted_binary_stream == received_binary_stream.'));
 
-            SYMBOLS = SYMBOLS + NumberOfSymbols;
+            BITCOUNT = BITCOUNT + NumberOfSymbols;
         end
         EbNo_vec=[EbNo_vec EbN0];
-        BER=[BER (ERRORS / SYMBOLS)];
+        BER=[BER (ERRORS / BITCOUNT)];
     end
 
 AVERAGE_BER{seed} = BER;
@@ -145,7 +143,7 @@ plot(EbNo_vec,BER,'LineWidth',1,'LineStyle',LS{1},'Marker','o')
 legend_data{1} = 'Simulation';
 plot(EbNo_vec,matlab_BER,'LineWidth',2,'LineStyle',LS{2})
 legend_data{2} = 'Analytic';
-title('Bit error rate for QPSK over Stationary AWGN Channel');
+title('QPSK Bit Error Rate Over Stationary AWGN Channel');
 xlabel('Eb/No (dB)')
 ylabel('BER')
 

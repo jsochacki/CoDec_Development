@@ -1,6 +1,6 @@
 clear all
 
-load('Results\BER_Test_Script_Rev003_Results.mat')
+load('Results\BER_Test_Script_Rev004_20_averages_test_number_1_Results.mat')
 
 matlab_BER = berawgn(EbNo_vec, 'psk', power(2, BITS_PER_WORD), 'nondiff');
 
@@ -15,7 +15,12 @@ plot(EbNo_vec,BER,'LineWidth',1,'LineStyle',LS{1},'Marker','o')
 legend_data{1} = 'Simulation';
 plot(EbNo_vec,matlab_BER,'LineWidth',2,'LineStyle',LS{2})
 legend_data{2} = 'Analytic';
-title('Bit error rate for QPSK over Stationary AWGN Channel');
+if exist('seed', 'var')
+    title(sprintf(['QPSK Bit Error Rate Over Stationary AWGN Channel\n' ...
+                  '%d Test Averages'], seed));
+else
+    title('QPSK Bit Error Rate Over Stationary AWGN Channel');
+end
 xlabel('Eb/No (dB)')
 ylabel('BER')
 
@@ -24,6 +29,4 @@ ax = gca;
 ax.YScale = 'log';
 ax.XTickMode = 'manual'
 ax.XMinorTick = 'on'
-% set(ax,'XTick',[8:1:32])
-% set(ax,'YTick',[-1:0.1:1])
 axis([min(EbNo_vec) max(EbNo_vec) 1e-6 1e-1])

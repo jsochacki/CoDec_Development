@@ -2,8 +2,7 @@ function [signal_with_awgn] = AWNG_Generator(signal, ...
                                              EbNo_dB, ...
                                              USAMPR, ...
                                              h, ...
-                                             BITS_PER_WORD, ...
-                                             seed)
+                                             BITS_PER_WORD)
 
 trn_signal=0;
 if size(signal,1) < size(signal,2), trn_signal=1; signal=signal.';, end;
@@ -21,13 +20,8 @@ N0 = mssp / SNR;
 %also since it is unit variance, x*randn has a stx=x and var=x^2
 %also for real systems var=No and for complex systems var=No/2
 if isreal(signal)
-    if isscalar(seed)
-        sigma = sqrt(N0);
-        Addative_White_Gaussian_Noise = sigma*randn(size(signal,1), 1);        
-    else
-        sigma = sqrt(N0);
-        Addative_White_Gaussian_Noise = sigma*randn(size(signal,1), 1);
-    end
+    sigma = sqrt(N0);
+    Addative_White_Gaussian_Noise = sigma*randn(size(signal,1), 1);
 else
     sigma = sqrt(N0/2);
     Addative_White_Gaussian_Noise = ...
@@ -36,6 +30,6 @@ end
 signal_with_awgn = ...
     signal + Addative_White_Gaussian_Noise;
 
-if trn_signal, signal=signal.';, end;
+if trn_signal, signal_with_awgn = signal_with_awgn.';, end;
 
 end
