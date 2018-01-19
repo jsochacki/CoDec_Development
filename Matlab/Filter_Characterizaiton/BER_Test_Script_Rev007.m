@@ -18,8 +18,11 @@ averages = 40;
 
 %RNG Settings
 rng('default');
-seed_vector = 1:1:20;
+seed_vector = 1:1:averages;
 rng(seed_vector(1), 'twister');
+
+%PN Code Settings
+lengthPNGI = 53; lengthPNGQ = lengthPNGI;
 
 %MODCOD Settings
 MODCOD = 1;
@@ -37,64 +40,103 @@ SYMBOL_RATE = 1; Fc = SYMBOL_RATE / 2;
 
 h = firrcos(ORDER, Fc, ROLLOFF, USAMPR, 'rolloff', 'sqrt');
 
-pre_post_fix = randsrc(1, length(h) * 2, unique(Binary_Alphabet).');
+pre_post_fix = randsrc(1, length(h) * 2, unique(Binary_Alphabet).').';
 prefix_bit_length = length(pre_post_fix);
 prefix_symbol_length = length(pre_post_fix) / BITS_PER_WORD;
 
 %Noise setting
 desired_sum_squared_power = ...
     (1/length(Complex_Alphabet)) * (Complex_Alphabet * Complex_Alphabet');
-EbN0_min=0; EbN0_max=4; step=0.1;
 
 for test_number = 1:1:1
     %Setup test cases
-    test_vector = test_vectors_initial_filter_test_only(test_number);
+    test_vector = test_vectors_top_level(test_number);
 
     %Load the IIR Filter
     
-    test_variables = load('filter_coefficients.mat',test_vector{:});
+    test_variables = load('filter_coefficients.mat', test_vector{1}{:});
+    test_variables.pn_length = test_vector{2};
+    test_variables.EbNo = test_vector{3};
+    test_variables.BER = test_vector{4};
     %Access is done dynamically in the following manner
-    sos = test_variables.(test_vector{1});
-    fos = test_variables.(test_vector{2});
-    k = test_variables.(test_vector{3});
+    sos = test_variables.(test_vector{1}{1});
+    fos = test_variables.(test_vector{1}{2});
+    k = test_variables.(test_vector{1}{3});
 
     AVERAGE_BER = {};
     for seed = 1:1:averages
         EbNo_vec=[]; BER=[];
         rng(seed_vector(seed), 'twister');
-        for EbN0 = EbN0_min:step:EbN0_max
+        initPNGMatrixI = randsrc(1, lengthPNGI, [0,1]);
+        initPNGMatrixQ = randsrc(1, lengthPNGQ, [0,1]);
+        for EbN0 = test_variables.EbNo
             EbN0
             ERRORS = 0;
             BITCOUNT = 0;
+            NumberOfBits = ((2^18) / ...
+                (BITS_PER_WORD * test_variables.pn_length));
             if EbN0 < 3
                 ERRORLIMIT = 1000;
-                NumberOfBits = 2^14;
             elseif (EbN0 >= 3) & (EbN0 < 6)
                 ERRORLIMIT = 700;
-                NumberOfBits = 2^15;
             elseif (EbN0 >= 6) & (EbN0 < 7)
                 ERRORLIMIT = 500;
-                NumberOfBits = 2^16;
             elseif (EbN0 >= 7) & (EbN0 < 8)
                 ERRORLIMIT = 300;
-                NumberOfBits = 2^17;
             else
                 ERRORLIMIT = 200;
-                NumberOfBits = 2^18;
             end
+            pnGI = comm.PNSequence('Polynomial', ...
+                                   [53 6 2 1 0], ...
+                                   'SamplesPerFrame', ...
+                                   test_variables.pn_length, ...
+                                   'InitialConditions', ...
+                                   initPNGMatrixI);
+            pnGQ = comm.PNSequence('Polynomial', ...
+                                   [53 6 2 1 0], ...
+                                   'SamplesPerFrame', ...
+                                   test_variables.pn_length, ...
+                                   'InitialConditions', ...
+                                   initPNGMatrixQ);
             while ERRORS < ERRORLIMIT
                 ERRORS
 
                 %Create desired bit stream
+                %I and Q mapped to QPSK per DVBS2 spec (I MSB Q LSB)
+                s = randsrc(NumberOfBits, 1, [1 0]);
+
+                cI = zeros(NumberOfBits * test_variables.pn_length, 1);
+                cQ = zeros(NumberOfBits * test_variables.pn_length, 1);
                 transmitted_binary_stream = ...
-                    randsrc(1, NumberOfBits, [1 0]);
+                    zeros(NumberOfBits * test_variables.pn_length, 1);
+
+                n = 0;
+                while (n < length(s))
+                    stream_indicies = ...
+                       (1 + (n * BITS_PER_WORD * test_variables.pn_length)):...
+                       ((n + 1) * BITS_PER_WORD * test_variables.pn_length);
+                    pnindicies = ...
+                       (1 + (n * test_variables.pn_length)):...
+                       ((n + 1) * test_variables.pn_length);
+                    cIt = (2 * (step(pnGI))) - 1;
+                    cQt = (2 * (step(pnGQ))) - 1;
+                    transmitted_binary_stream(stream_indicies) = ...
+                        ((2 * s(n + 1)) - 1) * ...
+                        ([upsample(cIt, 2)] + ...
+                         [0; upsample(cQt(1:end-1), 2); cQt(end)]);
+                    cI(pnindicies) = ((cIt + 1) / 2);
+                    cQ(pnindicies) = ((cQt + 1) / 2);
+                    n = n + 1;
+                end
+                transmitted_binary_stream = ...
+                    (transmitted_binary_stream + 1) / 2;
 
                 %append [pre/post]fix to absorb ringup and ringdown
                 transmitted_binary_stream = ...
-                    [pre_post_fix transmitted_binary_stream pre_post_fix];
+                    [pre_post_fix; transmitted_binary_stream; pre_post_fix];
 
                 %Map the binary stream to a word stream
-                binary_word_stream = binary_stream_to_binary_word_stream( ...
+                binary_word_stream = binary_stream_to_binary_word_stream2( ...
                                           transmitted_binary_stream, ...
                                           BITS_PER_WORD);
 
@@ -173,10 +215,11 @@ for test_number = 1:1:1
                     (1 + prefix_bit_length): ...
                     (end - prefix_bit_length));
 
+                %%%%NEED TO IMPLEMENT THE DESPREADER HERE TOMORROW
                 ERRORS = ERRORS + ...
                           (NumberOfBits - ...
                            sum(transmitted_binary_stream == ...
-                               received_binary_stream.'));
+                               received_binary_stream));
 
                 BITCOUNT = BITCOUNT + NumberOfBits;
             end
@@ -193,7 +236,7 @@ for test_number = 1:1:1
     end
     BER = BER / seed;
 
-    
+    EbNo_vec = test_variables.EbNo;
     matlab_BER = berawgn(EbNo_vec, 'psk', power(2, BITS_PER_WORD), 'nondiff');
 
     figure(1)
@@ -220,12 +263,12 @@ for test_number = 1:1:1
 
     legend(legend_data)
     ax = gca;
-    ax.YScale = 'log';
-    ax.XTickMode = 'manual'
-    ax.XMinorTick = 'on'
-    axis([min(EbNo_vec) max(EbNo_vec) 1e-2 1e-1])
+%     ax.YScale = 'log';
+%     ax.XTickMode = 'manual'
+%     ax.XMinorTick = 'on'
+%     axis([min(EbNo_vec) max(EbNo_vec) 1e-2 1e-1])
 
-    save(sprintf('Results\\BER_Test_Script_Rev006_%d_averages_test_number_%d_Results_0_to_4_EbNo.mat', ...
+    save(sprintf('Results\\BER_Test_Script_Rev006_%d_averages_test_number_%d_Results.mat', ...
          seed, ...
          test_number), ...
          'EbNo_vec', ...

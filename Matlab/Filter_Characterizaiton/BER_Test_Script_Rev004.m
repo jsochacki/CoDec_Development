@@ -13,7 +13,7 @@ averages = 20;
 
 %RNG Settings
 rng('default');
-seed_vector = 1:1:20;
+seed_vector = 1:1:averages;
 rng(seed_vector(1), 'twister');
 
 %MODCOD Settings

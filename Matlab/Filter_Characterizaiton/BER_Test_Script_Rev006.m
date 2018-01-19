@@ -14,7 +14,7 @@ msp = @(x) (1/length(x)) * sum(x .* x'.');
 mspnoringud = @(x,y) (1/(length(x)-(2*y))) * sum(x((1+(y)):1:(end-(y))) .* x((1+(y)):1:(end-(y)))'.');
 
 %Test Specifics
-averages = 100;
+averages = 40;
 
 %RNG Settings
 rng('default');
@@ -68,7 +68,7 @@ for test_number = 1:1:1
             BITCOUNT = 0;
             if EbN0 < 3
                 ERRORLIMIT = 1000;
-                NumberOfBits = 2^14;
+                NumberOfBits = 2^17;
             elseif (EbN0 >= 3) & (EbN0 < 6)
                 ERRORLIMIT = 700;
                 NumberOfBits = 2^15;
