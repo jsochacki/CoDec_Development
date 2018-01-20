@@ -1,8 +1,5 @@
 clear all
 
-%%% PAUSED, DUE TO LARGE IMPLEMENTATION DIFFERENCES THIS SCRIPT IS PAUSED
-%%% SO THAT I CAN IMPLEMENTN THE SPREADING / DESPREADING THE WAY THAT I HAD
-%%% INTENDED FOR IT TO BE IMPLEMENTED
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% This Rev of the script incorporates a very long ML PN code and using a 
 %%% spread spectrum modem for the BER testing.  It is done using the srrc
@@ -197,82 +194,39 @@ for test_number = 1:1:1
                     AGC(downsampled_receive_filtered_symbol_stream, ...
                         desired_sum_squared_power);
 
-                %Correlate I and Q in the classical sense
+                %%%%NEED TO IMPLEMENT THE DESPREADER HERE TOMORROW
                 r = zeros(NumberOfBits, 1);
                 n = 0;
                 while (n < length(s))
-                    i_indicies = ...
-                        (1 + (n * stream_pn_length))...
-                        :2:...
-                        ((n + 1) * stream_pn_length);
-                    q_indicies = ...
-                        (2 + (n * stream_pn_length))...
-                        :2:...
-                        ((n + 1) * stream_pn_length);
-                    symbol_indicies = ...
+                    stream_indicies = ...
+                       (1 + (n * stream_pn_length)):...
+                       ((n + 1) * stream_pn_length);
+                    pnindicies = ...
                        (1 + (n * test_variables.pn_length)):...
                        ((n + 1) * test_variables.pn_length);
-                    r(n + 1) = ...
-                        (real(downsampled_receive_filtered_symbol_stream(symbol_indicies).') * ...
-                        c(i_indicies)) +...
-                        (imag(downsampled_receive_filtered_symbol_stream(symbol_indicies).') * ...
-                        c(q_indicies));
+                    r(n+1) = ...
+                        transmitted_binary_stream(stream_indicies).' * ...
+                        c(stream_indicies);
                     n = n + 1;
                 end
-                %Correct way to do it mathematically but for safety sake
-                %I'll do the one below instead
-                %r = r / stream_pn_length;
-                r = r / max(abs(r));
+                r = r / stream_pn_length;
+                
+                while sum(abs(s-r)) > 0.05
+                f = downsample(bbdata_rx_srrc(1+ind:end-ind), USAMPR);
 
-                %Since you are doing an xor operation when you are doing
-                %spreading in the classical sense and using binary you end
-                %up with no inversion of the chipping sequence when your
-                %data bit is zero and when your data is a one you end up
-                %with an inversion of the chipping sequence
-                % e.g.  [0] xor [1 0 1 0] = [1 0 1 0]
-                % while [1] xor [1 0 1 0] = [0 1 0 1]
-                % so when you are doing the receive correlation you just
-                % xor again by the chipping sequence and sum and you end up
-                % with the summation of the chipping sequence correlation
-                % going to zero when you had a zero data bit and length(PN)
-                % when you had a one data bit
-                % e.g.  [0] xor [1 0 1 0] = [1 0 1 0] and 
-                % [1 0 1 0] xor [1 0 1 0] = [0 0 0 0] and
-                % sum([0 0 0 0]) = 0
-                % while [1] xor [1 0 1 0] = [0 1 0 1] and 
-                % [0 1 0 1] xor [1 0 1 0] = [1 1 1 1] and
-                % sum([1 1 1 1]) = 4 = length(PN)
-                % INSTEAD
-                % When you replace an xor opperation with a multiplication
-                % operation by converting a 0 to -1 and 1 to 1 then you end
-                % up with a zero bit inverting the chipping sequence and a
-                % 1 bit not inverting the chipping sequence as shown below
-                % e.g.  [-1] .* [1 -1 1 -1] = [-1 1 -1 1]
-                % while [1] .* [1 -1 1 -1] = [1 -1 1 -1]
-                % Then when you do the the receive multiplication and sum
-                % you end up with the summation of the chipping sequence
-                % correlation going to -length(PN) when you had a zero data
-                % bit as that was converted to a -1 and was inverting on
-                % the initial pn sequence and the correlation going to
-                % length(PN) when you had a one data bit as that was
-                % converted to a 1 and was non inverting as shown below
-                % e.g.  [-1] .* [1 -1 1 -1] = [-1 1 -1 1] and 
-                % [-1 1 -1 1] .* [1 -1 1 -1] = [-1 -1 -1 -1] and
-                % sum([-1 -1 -1 -1]) = -4 = -length(PN)
-                % while [1] .* [1 -1 1 -1] = [1 -1 1 -1] and 
-                % [1 -1 1 -1] .* [1 -1 1 -1] = [1 1 1 1] and
-                % sum([1 1 1 1]) = 4 = length(PN)
-                % So the point of all of that was to say, you either want
-                % to invert the chipping sequence on either the transmit or
-                % the receive sequence or you want to take the result of
-                % the correlation and invert that before thresholding back
-                % to bits.  Either is equivalent so do whatever you like
-                % or is easier.  In this case doing r = r < 0 is easier so
-                % that in the future you don't foreget that you are
-                % chipping the tx or rx by -c and have issues that are hard
-                % to track down as this is much more apparent upon the
-                % inspection of the code
-                r = r < 0 ;
+                n = 0;
+                r = [];
+                while (n < length(s))
+                    r = [r (f(((n * length(c)) + 1):((n + 1) * length(c))) * c')];
+                    n = n + 1;
+                end
+                r = r / length(c);
+                r = r ./ max(abs(r));
+                ind = ind + 1;
+                plot((r))
+                sum(abs(s-r))
+                ind
+                end
 
                 %Hard decision decoders
                 decoded_complex_stream = ...
@@ -302,8 +256,8 @@ for test_number = 1:1:1
 
                 ERRORS = ERRORS + ...
                           (NumberOfBits - ...
-                           sum(s == ...
-                               r));
+                           sum(transmitted_binary_stream == ...
+                               received_binary_stream));
 
                 BITCOUNT = BITCOUNT + NumberOfBits;
             end
