@@ -1,12 +1,12 @@
 clear all
 
-%%% PAUSED, DUE TO LARGE IMPLEMENTATION DIFFERENCES THIS SCRIPT IS PAUSED
-%%% SO THAT I CAN IMPLEMENTN THE SPREADING / DESPREADING THE WAY THAT I HAD
-%%% INTENDED FOR IT TO BE IMPLEMENTED
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% This Rev of the script incorporates a very long ML PN code and using a 
 %%% spread spectrum modem for the BER testing.  It is done using the srrc
 %%% filtering approach so that a baseline is established.
+%%% This Rev of the script implements the spreading and despreading in the
+%%% traditional manner which is different from the way that I implemented
+%%% the spreading during mathematical and simulation development.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Prototypes for troubleshooting
@@ -77,15 +77,15 @@ for test_number = 1:1:1
             BITCOUNT = 0;
             NumberOfBits = ((2^18) / stream_pn_length);
             if EbN0 < 3
-                ERRORLIMIT = 1000;
+                ERRORLIMIT = 2000;
             elseif (EbN0 >= 3) & (EbN0 < 6)
-                ERRORLIMIT = 700;
+                ERRORLIMIT = 1400;
             elseif (EbN0 >= 6) & (EbN0 < 7)
-                ERRORLIMIT = 500;
+                ERRORLIMIT = 1000;
             elseif (EbN0 >= 7) & (EbN0 < 8)
-                ERRORLIMIT = 300;
+                ERRORLIMIT = 600;
             else
-                ERRORLIMIT = 200;
+                ERRORLIMIT = 400;
             end
             pnGI = comm.PNSequence('Polynomial', ...
                                    [53 6 2 1 0], ...
@@ -101,7 +101,7 @@ for test_number = 1:1:1
                                    initPNGMatrixQ);
             while ERRORS < ERRORLIMIT
                 ERRORS
-
+                (ERRORS / BITCOUNT)
                 %Create desired bit stream
                 %I and Q mapped to QPSK per DVBS2 spec (I MSB Q LSB)
                 s = randsrc(NumberOfBits, 1, [1 0]);
@@ -352,7 +352,7 @@ for test_number = 1:1:1
 %     ax.XMinorTick = 'on'
 %     axis([min(EbNo_vec) max(EbNo_vec) 1e-2 1e-1])
 
-    save(sprintf('Results\\BER_Test_Script_Rev006_%d_averages_test_number_%d_Results.mat', ...
+    save(sprintf('Results\\BER_Test_Script_Rev007_%d_averages_test_number_%d_Results.mat', ...
          seed, ...
          test_number), ...
          'EbNo_vec', ...

@@ -1,0 +1,17 @@
+10:48:51 **** Incremental Build of configuration Debug for project mexdev ****
+Info: Internal Builder is used for build
+gcc -DMATLAB_MEX_FILE -DMX_COMPAT_32 -DNDEBUG "-IC:\\Program Files\\MATLAB\\R2015b\\extern\\include" "-IC:\\Program Files\\MATLAB\\R2015b\\extern\\lib\\win64\\mingw64" "-IC:\\Program Files\\MATLAB\\R2015b\\simulink\\include" -O0 -g3 -Wall -c -fmessage-length=0 -fexceptions -fno-omit-frame-pointer -o "src\\hello.o" "..\\src\\hello.c" 
+..\src\hello.c: In function 'mexFunction':
+..\src\hello.c:18:23: warning: variable 'a3' set but not used [-Wunused-but-set-variable]
+     double *a1, *a2, *a3;
+                       ^
+..\src\hello.c:18:18: warning: variable 'a2' set but not used [-Wunused-but-set-variable]
+     double *a1, *a2, *a3;
+                  ^
+..\src\hello.c:33:21: warning: 'temper' may be used uninitialized in this function [-Wmaybe-uninitialized]
+             *temper = a1[m + (n * mxGetN(prhs[0]))];
+                     ^
+gcc -s "-LC:\\Program Files\\MATLAB\\R2015b\\extern\\lib\\win64\\mingw64" -shared -o mexFunction.mexw64 "src\\hello.o" -llibmx -llibmex -llibmat -lm -llibmwlapack -llibmwblas -llibeng 
+
+10:48:52 Build Finished (took 1s.47ms)
+

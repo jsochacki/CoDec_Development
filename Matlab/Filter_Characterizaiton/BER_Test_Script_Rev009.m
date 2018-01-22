@@ -1,12 +1,13 @@
 clear all
 
+%%% Parfor version of Rev 007
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% This Rev of the script incorporates a very long ML PN code and using a 
 %%% spread spectrum modem for the BER testing.  It is done using the srrc
 %%% filtering approach so that a baseline is established.
 %%% This Rev of the script implements the spreading and despreading in the
-%%% the way that I implemented the spreading during mathematical and
-%%% simulation development.
+%%% traditional manner which is different from the way that I implemented
+%%% the spreading during mathematical and simulation development.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Prototypes for troubleshooting
@@ -66,7 +67,7 @@ for test_number = 1:1:1
     k = test_variables.(test_vector{1}{3});
 
     AVERAGE_BER = {};
-    for seed = 1:1:averages
+    parfor seed = 1:1:averages
         EbNo_vec=[]; BER=[];
         rng(seed_vector(seed), 'twister');
         initPNGMatrixI = randsrc(1, lengthPNGI, [0,1]);
@@ -79,13 +80,13 @@ for test_number = 1:1:1
             if EbN0 < 3
                 ERRORLIMIT = 2000;
             elseif (EbN0 >= 3) & (EbN0 < 6)
-                ERRORLIMIT = 1400;
+                ERRORLIMIT = 700;
             elseif (EbN0 >= 6) & (EbN0 < 7)
-                ERRORLIMIT = 1000;
+                ERRORLIMIT = 500;
             elseif (EbN0 >= 7) & (EbN0 < 8)
-                ERRORLIMIT = 600;
+                ERRORLIMIT = 300;
             else
-                ERRORLIMIT = 400;
+                ERRORLIMIT = 200;
             end
             pnGI = comm.PNSequence('Polynomial', ...
                                    [53 6 2 1 0], ...
@@ -106,81 +107,53 @@ for test_number = 1:1:1
                 %I and Q mapped to QPSK per DVBS2 spec (I MSB Q LSB)
                 s = randsrc(NumberOfBits, 1, [1 0]);
 
-                %Generate the code bit stream
-                cIt = zeros(test_variables.pn_length, 1);
-                cQt = zeros(test_variables.pn_length, 1);
-                code_binary_stream = zeros(NumberOfBits * stream_pn_length, 1);
+                cI = zeros(NumberOfBits * test_variables.pn_length, 1);
+                cQ = zeros(NumberOfBits * test_variables.pn_length, 1);
+                transmitted_binary_stream = ...
+                    zeros(NumberOfBits * stream_pn_length, 1);
+                c = zeros(NumberOfBits * stream_pn_length, 1);
 
                 n = 0;
                 while (n < length(s))
                     stream_indicies = ...
                        (1 + (n * stream_pn_length)):...
                        ((n + 1) * stream_pn_length);
-                    cIt = step(pnGI);
-                    cQt = step(pnGQ);
-                    code_binary_stream(stream_indicies) = ...
+                    pnindicies = ...
+                       (1 + (n * test_variables.pn_length)):...
+                       ((n + 1) * test_variables.pn_length);
+                    cIt = (2 * (step(pnGI))) - 1;
+                    cQt = (2 * (step(pnGQ))) - 1;
+                    c(stream_indicies) = ...
                         [upsample(cIt, 2)] + ...
                          [0; upsample(cQt(1:end-1), 2); cQt(end)];
+                    transmitted_binary_stream(stream_indicies) = ...
+                        ((2 * s(n + 1)) - 1) * c(stream_indicies);
+                    cI(pnindicies) = ((cIt + 1) / 2);
+                    cQ(pnindicies) = ((cQt + 1) / 2);
                     n = n + 1;
                 end
 
-                %Map the data binary stream to a word stream
-                data_binary_word_stream = binary_stream_to_binary_word_stream2( ...
-                                          s, ...
-                                          BITS_PER_WORD);
-
-                %Map the data word stream to a symbol stream
-                data_symbol_stream = ...
-                    one_to_one_mapper2(data_binary_word_stream, ...
-                                       Binary_Alphabet, ...
-                                       Complex_Alphabet);
-
-                %Map the code binary stream to a word stream
-                code_word_stream = binary_stream_to_binary_word_stream2( ...
-                                          code_binary_stream, ...
-                                          BITS_PER_WORD);
-
-                %Map the code word stream to a symbol stream
-                code_symbol_stream = ...
-                    one_to_one_mapper2(code_word_stream, ...
-                                       Binary_Alphabet, ...
-                                       Complex_Alphabet);
-
-                %Map the [pre/post]fix binary stream to a word stream
-                pre_post_fix_word_stream = binary_stream_to_binary_word_stream2( ...
-                                          pre_post_fix, ...
-                                          BITS_PER_WORD);
-
-                %Map the [pre/post]fix word stream to a symbol stream
-                pre_post_fix_symbol_stream = ...
-                    one_to_one_mapper2(pre_post_fix_word_stream, ...
-                                       Binary_Alphabet, ...
-                                       Complex_Alphabet);
-
-                %Spread that data by the code
-                transmitted_symbol_stream = ...
-                    zeros(NumberOfBits * stream_pn_length / BITS_PER_WORD, 1);
-
-                n = 0;
-                while (n < length(data_symbol_stream))
-                    stream_indicies = ...
-                       (1 + (n * (stream_pn_length / BITS_PER_WORD))):...
-                       ((n + 1) * (stream_pn_length / BITS_PER_WORD));
-                    transmitted_symbol_stream(stream_indicies) = ...
-                        data_symbol_stream(n + 1) * ...
-                        code_symbol_stream(stream_indicies);
-                    n = n + 1;
-                end
+                %Reset back to bits
+                transmitted_binary_stream = ...
+                    (transmitted_binary_stream + 1) / 2;
 
                 %append [pre/post]fix to absorb ringup and ringdown
-                transmitted_symbol_stream = ...
-                    [pre_post_fix_symbol_stream; ...
-                     transmitted_symbol_stream; ...
-                     pre_post_fix_symbol_stream];
+                transmitted_binary_stream = ...
+                    [pre_post_fix; transmitted_binary_stream; pre_post_fix];
+
+                %Map the binary stream to a word stream
+                binary_word_stream = binary_stream_to_binary_word_stream2( ...
+                                          transmitted_binary_stream, ...
+                                          BITS_PER_WORD);
+
+                %Map the word stream to a symbol stream
+                symbol_stream = ...
+                    one_to_one_mapper2(binary_word_stream, ...
+                                       Binary_Alphabet, ...
+                                       Complex_Alphabet);
 
                 %Up sample the symbols
-                upsampled_symbol_stream = ...
-                    upsample(transmitted_symbol_stream, USAMPR);
+                upsampled_symbol_stream = upsample(symbol_stream, USAMPR);
 
                 %SRRC filtering routine                
                 transmit_filtered_symbol_stream = ...
@@ -225,29 +198,87 @@ for test_number = 1:1:1
                     AGC(downsampled_receive_filtered_symbol_stream, ...
                         desired_sum_squared_power);
 
-                %Correlate at the complex level
-                r = zeros(NumberOfBits / BITS_PER_WORD, 1);
+                %Correlate I and Q in the classical sense
+                r = zeros(NumberOfBits, 1);
                 n = 0;
-                while (n < length(data_symbol_stream))
+                while (n < length(s))
+                    i_indicies = ...
+                        (1 + (n * stream_pn_length))...
+                        :2:...
+                        ((n + 1) * stream_pn_length);
+                    q_indicies = ...
+                        (2 + (n * stream_pn_length))...
+                        :2:...
+                        ((n + 1) * stream_pn_length);
                     symbol_indicies = ...
                        (1 + (n * test_variables.pn_length)):...
                        ((n + 1) * test_variables.pn_length);
                     r(n + 1) = ...
-                        code_symbol_stream(symbol_indicies)' * ...
-                        downsampled_receive_filtered_symbol_stream(symbol_indicies);
+                        (real(downsampled_receive_filtered_symbol_stream(symbol_indicies).') * ...
+                        c(i_indicies)) +...
+                        (imag(downsampled_receive_filtered_symbol_stream(symbol_indicies).') * ...
+                        c(q_indicies));
                     n = n + 1;
                 end
                 %Correct way to do it mathematically but for safety sake
                 %I'll do the one below instead
-                %r = r / test_variables.pn_length;
-                %Normalize the mean squared power to that of the
-                %constellation
-                r = AGC(r, desired_sum_squared_power);
+                %r = r / stream_pn_length;
+                r = r / max(abs(r));
+
+                %Since you are doing an xor operation when you are doing
+                %spreading in the classical sense and using binary you end
+                %up with no inversion of the chipping sequence when your
+                %data bit is zero and when your data is a one you end up
+                %with an inversion of the chipping sequence
+                % e.g.  [0] xor [1 0 1 0] = [1 0 1 0]
+                % while [1] xor [1 0 1 0] = [0 1 0 1]
+                % so when you are doing the receive correlation you just
+                % xor again by the chipping sequence and sum and you end up
+                % with the summation of the chipping sequence correlation
+                % going to zero when you had a zero data bit and length(PN)
+                % when you had a one data bit
+                % e.g.  [0] xor [1 0 1 0] = [1 0 1 0] and 
+                % [1 0 1 0] xor [1 0 1 0] = [0 0 0 0] and
+                % sum([0 0 0 0]) = 0
+                % while [1] xor [1 0 1 0] = [0 1 0 1] and 
+                % [0 1 0 1] xor [1 0 1 0] = [1 1 1 1] and
+                % sum([1 1 1 1]) = 4 = length(PN)
+                % INSTEAD
+                % When you replace an xor opperation with a multiplication
+                % operation by converting a 0 to -1 and 1 to 1 then you end
+                % up with a zero bit inverting the chipping sequence and a
+                % 1 bit not inverting the chipping sequence as shown below
+                % e.g.  [-1] .* [1 -1 1 -1] = [-1 1 -1 1]
+                % while [1] .* [1 -1 1 -1] = [1 -1 1 -1]
+                % Then when you do the the receive multiplication and sum
+                % you end up with the summation of the chipping sequence
+                % correlation going to -length(PN) when you had a zero data
+                % bit as that was converted to a -1 and was inverting on
+                % the initial pn sequence and the correlation going to
+                % length(PN) when you had a one data bit as that was
+                % converted to a 1 and was non inverting as shown below
+                % e.g.  [-1] .* [1 -1 1 -1] = [-1 1 -1 1] and 
+                % [-1 1 -1 1] .* [1 -1 1 -1] = [-1 -1 -1 -1] and
+                % sum([-1 -1 -1 -1]) = -4 = -length(PN)
+                % while [1] .* [1 -1 1 -1] = [1 -1 1 -1] and 
+                % [1 -1 1 -1] .* [1 -1 1 -1] = [1 1 1 1] and
+                % sum([1 1 1 1]) = 4 = length(PN)
+                % So the point of all of that was to say, you either want
+                % to invert the chipping sequence on either the transmit or
+                % the receive sequence or you want to take the result of
+                % the correlation and invert that before thresholding back
+                % to bits.  Either is equivalent so do whatever you like
+                % or is easier.  In this case doing r = r < 0 is easier so
+                % that in the future you don't foreget that you are
+                % chipping the tx or rx by -c and have issues that are hard
+                % to track down as this is much more apparent upon the
+                % inspection of the code
+                r = r < 0 ;
 
                 %Hard decision decoders
                 decoded_complex_stream = ...
                         AWGN_maximum_likelyhood_hard_decision_decoder( ...
-                            r, ...
+                            downsampled_receive_filtered_symbol_stream, ...
                             Complex_Alphabet, ...
                             Complex_Alphabet);
 
@@ -263,10 +294,17 @@ for test_number = 1:1:1
                         received_binary_word_stream, ...
                         BITS_PER_WORD);
 
+                %Throw away pre fix and post fix bits on original signal
+                %for BER calculations
+                transmitted_binary_stream = ...
+                    transmitted_binary_stream(...
+                    (1 + prefix_bit_length): ...
+                    (end - prefix_bit_length));
+
                 ERRORS = ERRORS + ...
                           (NumberOfBits - ...
                            sum(s == ...
-                               received_binary_stream));
+                               r));
 
                 BITCOUNT = BITCOUNT + NumberOfBits;
             end
@@ -315,7 +353,7 @@ for test_number = 1:1:1
 %     ax.XMinorTick = 'on'
 %     axis([min(EbNo_vec) max(EbNo_vec) 1e-2 1e-1])
 
-    save(sprintf('Results\\BER_Test_Script_Rev008_%d_averages_test_number_%d_Results.mat', ...
+    save(sprintf('Results\\BER_Test_Script_Rev009_%d_averages_test_number_%d_Results.mat', ...
          seed, ...
          test_number), ...
          'EbNo_vec', ...

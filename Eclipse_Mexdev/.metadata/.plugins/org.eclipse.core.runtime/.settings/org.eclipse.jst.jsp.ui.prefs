@@ -1,0 +1,9 @@
+SCRIPT_AREA_BORDER=\#FFFFFF | \#191919 | null | null | null | null
+commentBorder=\#8C3FC8 | \#191919 | null | null | null | null
+commentText=\#8C3FC8 | \#191919 | null | null | null | null
+eclipse.preferences.version=1
+jsp_content=\#FFFFFF | \#191919 | null | null | null | null
+tagAttributeEquals=\#FFFFFF | \#191919 | null | null | null | null
+tagAttributeName=\#EC691E | \#191919 | null | null | null | null
+tagAttributeValue=\#477488 | \#191919 | null | null | null | null
+tagBorder=\#F7C527 | \#191919 | null | null | null | null
