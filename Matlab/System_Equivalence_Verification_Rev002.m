@@ -1,5 +1,7 @@
 clear all
 
+%This is a hodge podge and just skip it
+
 PLOT=0;
 
 USAMPR = 2;
