@@ -32,6 +32,18 @@ sos = [1, 2, 1, 1, -0.00167168643843794, 0.989487857268303; ...
        1, 2, 1, 1, -1.54246025866515, 0.599009298304714];
 fos = []; k = 2.64095494237960e-14;
 
+% BITS_PER_WORD = 2; test_number = 1;
+% test_vector = test_vectors_top_level(test_number);
+% test_variables = load('filter_coefficients.mat', test_vector{1}{:});
+% test_variables.pn_length = test_vector{2};
+% stream_pn_length = BITS_PER_WORD * test_variables.pn_length;
+% test_variables.EbNo = test_vector{3};
+% test_variables.BER = test_vector{4};
+% %Access is done dynamically in the following manner
+% sos = test_variables.(test_vector{1}{1});
+% fos = test_variables.(test_vector{1}{2});
+% k = test_variables.(test_vector{1}{3});
+
 %%% Alphabet Information
 complex_mapping = exp(1j*([0,3,1,2].'*pi/2+pi/4)).';
 Prefix = randsrc(1, 2 * length(h),complex_mapping,3);
@@ -73,70 +85,87 @@ bbdata_rx_iir = fliplr(sout_iir);
 bbdata_rx_iir = custom_filter(bbdata_rx_iir, sos, fos, k);
 bbdata_rx_iir = fliplr(bbdata_rx_iir);
 
-ind = 0;
-r = 0;
 hold off
 plot((s))
 hold on
-while sum(abs(s-r)) > 1
-    f = downsample(bbdata_rx_iir(1+ind:end-ind), USAMPR);
-
-    n = 0;
-    r = [];
-    while (n < length(s))
-        indicies = 1 + (n*symbol_pn_size):(n+1)*symbol_pn_size;
-        r = [r (f(indicies) * c(indicies)')];
-        n = n + 1;
-    end
-    r = r / length(c);
-    r = r ./ max(abs(r));
-    ind = ind + 1;
-    plot((r))
-    sum(abs(s-r))
-    ind
-end
-
-[EsNo_dB EVM_dB] = EsNo_and_EVM(s, r)
-
-g = upsample(c'.', USAMPR); %Mathematically correct but has different ind value than other way
-g = custom_filter(g, sos, fos, k);
-
-ind = 0;
-r2 = 0;
-hold off
-plot((s))
-hold on
-while sum(abs(s-r2)) > 0.5
-    f2 = sout_iir(1+ind:end-ind);
-
-    n = 0;
-    r2 = [];
-    while (n < length(s))
-        indicies = 1 + (n*symbol_pn_size*USAMPR):(n+1)*symbol_pn_size*USAMPR;
-        r2 = [r2 (f2(indicies) * g(indicies).')];
-        n = n + 1;
-    end
-    r2 = r2 / length(g);
-    r2 = r2 ./ max(abs(r2));
-    ind = ind + 1;
-    plot((r2))
-    sum(abs(s-r2))
-    ind
-end
-
-[EsNo_dB EVM_dB] = EsNo_and_EVM(s, r2)
 
 ind = length(Prefix) * USAMPR;
-f2 = sout_iir(1+ind:end-ind);
-n = 0;
-r2 = [];
+f = downsample(bbdata_rx_iir(1+ind:end-ind), USAMPR);
+n = 0; r = [];
 while (n < length(s))
-    indicies = 1 + (n*symbol_pn_size*USAMPR):(n+1)*symbol_pn_size*USAMPR;
-    r2 = [r2 (f2(indicies) * g(indicies).')];
+    indicies = 1 + (n*symbol_pn_size):(n+1)*symbol_pn_size;
+    r = [r (f(indicies) * c(indicies)')];
     n = n + 1;
 end
-r2 = r2 / length(g);
-r2 = r2 ./ max(abs(r2));
+r = r / symbol_pn_size;
+r = AGC2(r, 1, 0);
+plot((r))
+sum(abs(s-r))
+[EsNo_dB EVM_dB] = EsNo_and_EVM(s, r)
+
+hold off
+plot((s))
+hold on
+
+ind = (length(Prefix) * USAMPR) + (((length(h) - 1) / 2) * 2);
+f2 = downsample(bbdata_rx_srrc(1+ind:end-ind), USAMPR);
+n = 0; r2 = [];
+while (n < length(s))
+    indicies = 1 + (n*symbol_pn_size):(n+1)*symbol_pn_size;
+    r2 = [r2 (f2(indicies) * c(indicies)')];
+    n = n + 1;
+end
+r2 = r2 / symbol_pn_size;
 r2 = AGC2(r2, 1, 0);
 plot((r2))
 sum(abs(s-r2))
+[EsNo_dB EVM_dB] = EsNo_and_EVM(s, r2)
+
+hold off
+plot((s))
+hold on
+
+g = upsample(c'.', USAMPR);
+g = custom_filter(g, sos, fos, k);
+
+ind = (length(Prefix) * USAMPR);
+f3 = sout_iir(1+ind:end-ind);
+n = 0; r3 = [];
+while (n < length(s))
+    indicies = (1 + (n * (symbol_pn_size * USAMPR))) ...
+               :((n+1) * (symbol_pn_size * USAMPR));
+    r3 = [r3 (f3(indicies) * g(indicies).')];
+    n = n + 1;
+end
+r3 = r3 / symbol_pn_size;
+r3 = AGC2(r3, 1, 0);
+plot((r3))
+sum(abs(s-r3))
+[EsNo_dB EVM_dB] = EsNo_and_EVM(s, r3)
+
+
+hold off
+plot((s))
+hold on
+
+g = upsample(c'.', USAMPR);
+g = conv(fliplr(h), g);
+%%%%THE LENGTH OF G EXPANDS HERE SO YOU NEED TO TREAT
+%%%%THAT PROPERLY BELOW by offsetting the indicies of g that you use to be
+%%%%the ones that are valid only and not in the ringud of the filter or you
+%%%%can just throw away the ring up and ring down
+g = g(1 + ((length(h) - 1) / 2):end-((length(h) - 1) / 2));
+ind = (length(Prefix) * USAMPR) + (((length(h) - 1) / 2));
+f4 = sout_srrc(1+ind:end-ind);
+n = 0; r4 = [];
+while (n < length(s))
+    indicies = (1 + (n * (symbol_pn_size * USAMPR))) ...
+               :((n+1) * (symbol_pn_size * USAMPR));
+    r4 = [r4 (f4(indicies) * g(indicies).')];
+    n = n + 1;
+end
+r4 = r4 / symbol_pn_size;
+r4 = AGC2(r4, 1, 0);
+plot((r4))
+sum(abs(s-r4))
+[EsNo_dB EVM_dB] = EsNo_and_EVM(s, r4)
