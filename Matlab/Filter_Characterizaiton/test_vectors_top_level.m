@@ -60,6 +60,18 @@ function [test_vector] = test_vectors_top_level(test_number)
         case 20
             filter_variables = {'sos_15dB', 'fos_15dB', 'k_15dB'};
             pn_variables = 2^16;
+        case 21  %3dB tests with relaxed filter
+            filter_variables = {'sos_3dB_30dB', 'fos_3dB_30dB', 'k_3dB_30dB'};
+            pn_variables = 2^7;
+        case 22
+            filter_variables = {'sos_3dB_30dB', 'fos_3dB_30dB', 'k_3dB_30dB'};
+            pn_variables = 2^10;
+        case 23
+            filter_variables = {'sos_3dB_30dB', 'fos_3dB_30dB', 'k_3dB_30dB'};
+            pn_variables = 2^13;
+        case 24
+            filter_variables = {'sos_3dB_30dB', 'fos_3dB_30dB', 'k_3dB_30dB'};
+            pn_variables = 2^16;
         otherwise
     end
     EbNo_variables = 0.5:0.05:1.5;

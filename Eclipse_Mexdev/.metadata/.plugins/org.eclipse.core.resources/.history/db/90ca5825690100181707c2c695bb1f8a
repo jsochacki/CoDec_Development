@@ -72,11 +72,11 @@ void mexFunction( int nlhs, mxArray *plhs[],
                          output_M,
                          output_N);
 
-    map_2_columns_to_1(binary_word_stream,
-                       binary_alphabet,
-                       complex_alphabet_real,
-                       complex_alphabet_imaginary,
-                       output_M);
+    map_2_columns_to_1(*data_matrix,
+                       *from_matrix,
+                       *to_real_matrix,
+                       *to_imaginary_matrix,
+                        M);
 
 }
 
@@ -143,13 +143,9 @@ void map_2_columns_to_1(double *data_matrix,
 {
     mwIndex m = 0;
     mwIndex N = 2;
-    mwIndex bit_0_index = 0;
-    mwIndex bit_1_index = 0;
 
     for(m = 0; m < M; m++)
     {
-        //data_matrix[m + (n * M)];
-        bit_0_index =
-        printf("%f", data_matrix[m + (n * M)], from_matrix[m + (n * M)
+        data_matrix[m + (n * M)];
     }
 }

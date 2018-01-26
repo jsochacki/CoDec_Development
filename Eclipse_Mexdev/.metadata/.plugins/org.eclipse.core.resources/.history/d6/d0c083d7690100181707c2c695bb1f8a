@@ -143,13 +143,9 @@ void map_2_columns_to_1(double *data_matrix,
 {
     mwIndex m = 0;
     mwIndex N = 2;
-    mwIndex bit_0_index = 0;
-    mwIndex bit_1_index = 0;
 
     for(m = 0; m < M; m++)
     {
-        //data_matrix[m + (n * M)];
-        bit_0_index =
-        printf("%f", data_matrix[m + (n * M)], from_matrix[m + (n * M)
+        data_matrix[m + (n * M)];
     }
 }
