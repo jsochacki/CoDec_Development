@@ -3,7 +3,7 @@ clear all
 %%% This is a script to generate the impulse response for an IIR filter and
 %%% some metrics associated with it
 
-USAMPR = 2;
+USAMPR = 8;
 
 %SRRC Filter for Comparison
 NSYMBOLS_LONG_FILTER = 120; ORDER = USAMPR * NSYMBOLS_LONG_FILTER;
@@ -19,9 +19,9 @@ s = [1 zeros(1, number_of_samples - 1)];
 %IIR Filter Parameter Vectors
 fc = 0.5 / USAMPR;
 insertion_loss_at_fc = [3 3 3];
-transition_region_width = [0.0125 0.0125 0.0125];
+transition_region_width = [(0.0125 * 2 / USAMPR) (0.0125 * 2 / USAMPR)*1.5 (0.0125 * 2 / USAMPR)*2];
 ripple = [0.001 0.001 0.001];
-rejection = [90 60 30];
+rejection = [90 90 90];
 
 index = 1; filter_names = {};
 for test_number = 1:1:length(insertion_loss_at_fc)
@@ -61,7 +61,6 @@ end
 sout_srrc = conv(h, s);
 sout_srrc = sout_srrc ./ max(abs(sout_srrc));
 sout_srrc = sout_srrc(1 + ((length(h) - 1) / 2):end - ((length(h) - 1) / 2));
-%sout_srrc = sout_srrc(1:end - 2*((length(h) - 1) / 2));
 
 xaxis = linspace(1,number_of_samples,number_of_samples);
 
