@@ -61,6 +61,7 @@ end
 sout_srrc = conv(h, s);
 sout_srrc = sout_srrc ./ max(abs(sout_srrc));
 sout_srrc = sout_srrc(1 + ((length(h) - 1) / 2):end - ((length(h) - 1) / 2));
+%sout_srrc = sout_srrc(1:end - 2*((length(h) - 1) / 2));
 
 xaxis = linspace(1,number_of_samples,number_of_samples);
 
