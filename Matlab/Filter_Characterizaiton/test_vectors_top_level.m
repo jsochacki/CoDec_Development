@@ -1,6 +1,6 @@
 function [test_vector] = test_vectors_top_level(test_number)
     switch test_number
-        case 1  %3dB tests
+        case 1  %3dB tests : Designed with USAMPR = 2
             filter_variables = {'sos_3dB', 'fos_3dB', 'k_3dB'};
             pn_variables = 2^7;
         case 2
@@ -12,7 +12,7 @@ function [test_vector] = test_vectors_top_level(test_number)
         case 4
             filter_variables = {'sos_3dB', 'fos_3dB', 'k_3dB'};
             pn_variables = 2^16;
-        case 5  %6dB tests
+        case 5  %6dB tests : Designed with USAMPR = 2
             filter_variables = {'sos_6dB', 'fos_6dB', 'k_6dB'};
             pn_variables = 2^7;
         case 6
@@ -24,7 +24,7 @@ function [test_vector] = test_vectors_top_level(test_number)
         case 8
             filter_variables = {'sos_6dB', 'fos_6dB', 'k_6dB'};
             pn_variables = 2^16;
-        case 9  %9dB tests
+        case 9  %9dB tests : Designed with USAMPR = 2
             filter_variables = {'sos_9dB', 'fos_9dB', 'k_9dB'};
             pn_variables = 2^7;
         case 10
@@ -36,7 +36,7 @@ function [test_vector] = test_vectors_top_level(test_number)
         case 12
             filter_variables = {'sos_9dB', 'fos_9dB', 'k_9dB'};
             pn_variables = 2^16;
-        case 13  %12dB tests
+        case 13  %12dB tests : Designed with USAMPR = 2
             filter_variables = {'sos_12dB', 'fos_12dB', 'k_12dB'};
             pn_variables = 2^7;
         case 14
@@ -48,7 +48,7 @@ function [test_vector] = test_vectors_top_level(test_number)
         case 16
             filter_variables = {'sos_12dB', 'fos_12dB', 'k_12dB'};
             pn_variables = 2^16;
-        case 17  %15dB tests
+        case 17  %15dB tests : Designed with USAMPR = 2
             filter_variables = {'sos_15dB', 'fos_15dB', 'k_15dB'};
             pn_variables = 2^7;
         case 18
@@ -60,7 +60,7 @@ function [test_vector] = test_vectors_top_level(test_number)
         case 20
             filter_variables = {'sos_15dB', 'fos_15dB', 'k_15dB'};
             pn_variables = 2^16;
-        case 21  %3dB tests with relaxed filter
+        case 21  %3dB tests with relaxed filter : Designed with USAMPR = 2
             filter_variables = {'sos_3dB_30dB', 'fos_3dB_30dB', 'k_3dB_30dB'};
             pn_variables = 2^7;
         case 22
@@ -71,6 +71,30 @@ function [test_vector] = test_vectors_top_level(test_number)
             pn_variables = 2^13;
         case 24
             filter_variables = {'sos_3dB_30dB', 'fos_3dB_30dB', 'k_3dB_30dB'};
+            pn_variables = 2^16;
+        case 25  %3dB tests with harris srrc filter : Designed with USAMPR = 32
+            filter_variables = {'h_3dB'};
+            pn_variables = 2^7;
+        case 26
+            filter_variables = {'h_3dB'};
+            pn_variables = 2^10;
+        case 27
+            filter_variables = {'h_3dB'};
+            pn_variables = 2^13;
+        case 28
+            filter_variables = {'h_3dB'};
+            pn_variables = 2^16;
+        case 29  %18dB tests with harris srrc filter : Designed with USAMPR = 32
+            filter_variables = {'h_18dB'};
+            pn_variables = 2^7;
+        case 30
+            filter_variables = {'h_18dB'};
+            pn_variables = 2^10;
+        case 31
+            filter_variables = {'h_18dB'};
+            pn_variables = 2^13;
+        case 32
+            filter_variables = {'h_18dB'};
             pn_variables = 2^16;
         otherwise
     end
