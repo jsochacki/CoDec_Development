@@ -10,7 +10,7 @@ function [word_stream] = ...
 trn=0;
 if size(data_stream,1) > 1, trn=1; data_stream=data_stream.';, end;
 % Pre allocating makes it 4 x faster
-word_stream=zeros((length(data_stream) / BITS_PER_WORD), 2);
+word_stream=zeros((length(data_stream) / BITS_PER_WORD), BITS_PER_WORD);
 index = 1;
 for nn=1:BITS_PER_WORD:length(data_stream)
     word_stream(index,:) = data_stream(nn:(nn+BITS_PER_WORD-1));
