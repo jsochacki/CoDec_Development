@@ -1,5 +1,8 @@
 # For PCBs designed using KiCad: http://www.kicad-pcb.org/
 
+# Source Code Directory to ignore
+Eclipse_Mexdev/
+
 # Temporary files
 *.000
 *.bak
